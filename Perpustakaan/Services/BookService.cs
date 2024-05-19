@@ -59,8 +59,9 @@ namespace Perpustakaan.Services
             {
                 throw new InvalidRequestValueException(_validator.Errors);
             }
+            
 
-            Book? book = _repository.Update(id, request, ClaimTypes.Name);
+            Book? book = _repository.Update(id, request);
             if (book == null)
             {
                 throw new InvalidRequestValueException(null, "INVALID_ID");

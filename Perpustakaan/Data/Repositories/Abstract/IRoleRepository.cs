@@ -5,13 +5,13 @@ using Perpustakaan.Models.Requests;
 
 namespace Perpustakaan.Data.Repositories.Abstract
 {
-    public interface IBookRepository
+    public interface IRoleRepository
     {
-        List<Book> FetchAll();
-        Paginated<Book> FetchAll(SearchRequest request);
-        Book? FetchOne(int id);
-        Book Create(BookRequest request);
-        Book? Update(int id, BookRequest request);
+        List<Role> FetchAll();
+        Paginated<Role> FetchAll(SearchRequest request);
+        Role? FetchOne(int id);
+        Role Create(RoleRequest request);
+        Role? Update(int id, RoleRequest request);
         List<string> Delete(DeleteRequest ids);
     }
 }

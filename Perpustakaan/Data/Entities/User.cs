@@ -37,5 +37,7 @@ namespace Perpustakaan.Data.Entities
         [JsonIgnore]
         public DateTime? RefreshTokenExpiryTime { get; set; }
 
+        public virtual ICollection<UserRole>? UserRole { get; set; }
+
     }
 }

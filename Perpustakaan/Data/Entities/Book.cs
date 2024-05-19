@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Perpustakaan.Data.Entities
 {
-    [Table(name:"books")]
+    [Table(name:"book")]
     public class Book
     {
         [Key]
@@ -29,7 +29,7 @@ namespace Perpustakaan.Data.Entities
         public DateTime CreatedDate { get; set; }
 
         [Column(name: "updated_date")]
-        public DateTime UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
 
         [Column(name:"created_by")]
         public string CreatedBy{ get; set; }

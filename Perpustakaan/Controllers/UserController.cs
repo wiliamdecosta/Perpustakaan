@@ -44,6 +44,23 @@ namespace Perpustakaan.Controllers
             return Ok(responseData);
         }
 
+        [HttpGet("list")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize]
+        public ActionResult<BaseResponse<List<User>>> ListUser()
+        {
+            List<User> user = _service.FetchAll();
+
+            var responseData = BaseResponse<List<User>>.Builder()
+                .Code(StatusCodes.Status200OK)
+                .Message("REGISTER_USER_SUCCESS")
+                .Data(user)
+                .Build();
+
+            return Ok(responseData);
+        }
+
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

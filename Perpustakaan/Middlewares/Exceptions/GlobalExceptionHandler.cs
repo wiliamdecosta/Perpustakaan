@@ -3,7 +3,7 @@ using JustclickCoreModules.Responses;
 using JustclickCoreModules.Validators;
 using System.Net;
 
-namespace Perpustakaan.Exceptions
+namespace Perpustakaan.Middleware.Exceptions
 {
     public class GlobalExceptionHandler : IMiddleware
     {
@@ -31,7 +31,7 @@ namespace Perpustakaan.Exceptions
                    .Message(ex.Message)
                    .Data(null);
 
-                if (context.Response.StatusCode == (int)StatusCodes.Status401Unauthorized)
+                if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
                 {
                     problem.Code(StatusCodes.Status401Unauthorized);
                     problem.Message("Token tidak valid");

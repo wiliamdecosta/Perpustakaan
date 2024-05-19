@@ -5,7 +5,7 @@ using Perpustakaan.Data.Entities;
 using Perpustakaan.Data.Repositories.Abstract;
 using Perpustakaan.Models.Requests;
 using Perpustakaan.Utils.Filters;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Perpustakaan.Data.Repositories.Implementation
@@ -26,7 +26,9 @@ namespace Perpustakaan.Data.Repositories.Implementation
 
         public List<User> FetchAll()
         {
-            return _db.Users.ToList();
+            var result =  _db.Users.Include(obj => obj.UserRole).ToList();
+            var output = result;
+            return result;
         }
 
         public Paginated<User> FetchAll(SearchRequest request)

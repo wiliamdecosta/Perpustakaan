@@ -9,6 +9,12 @@ namespace Perpustakaan.Utils
 {
     public class JwtUtil
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public JwtUtil(IHttpContextAccessor httpContextAccessor) {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
         public static string GenerateJwtToken(User user, IConfiguration _configuration)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -16,9 +22,10 @@ namespace Perpustakaan.Utils
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
-                new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Authentication, user.Id.ToString()),
+                new Claim("UserId", user.Id.ToString()),
+                new Claim("CreatedDate", user.CreatedDate.ToString("o")), // Klaim createdDate
+                new Claim(ClaimTypes.Email, user.Email) // Klaim email
             }),
                 Expires = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:DurationInMinutes"])),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
@@ -38,5 +45,12 @@ namespace Perpustakaan.Utils
                 return Convert.ToBase64String(randomNumber);
             }
         }
+
+        public string? GetClaimValue(string key)
+        {
+            var emailClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(key);
+            return emailClaim?.Value;
+        }
+
     }
 }

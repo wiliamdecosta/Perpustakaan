@@ -1,10 +1,12 @@
 ﻿using JustclickCoreModules.Filters;
+using JustclickCoreModules.Requests;
 using JustclickCoreModules.Responses;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Perpustakaan.Data.Entities;
+using Perpustakaan.Models.Requests;
 using Perpustakaan.Services;
+using System.Security.Claims;
 
 namespace Perpustakaan.Controllers
 {
@@ -17,7 +19,7 @@ namespace Perpustakaan.Controllers
         }
 
 
-        [HttpPost("all")]
+        [HttpPost("all", Name ="GetAll")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize]
         public ActionResult<BaseResponse<List<Book>>> GetAllBooks([FromBody] SearchRequest request)
@@ -26,7 +28,7 @@ namespace Perpustakaan.Controllers
 
             var responseData = BaseResponse<List<Book>>.Builder()
                 .Code(StatusCodes.Status200OK)
-                .Message("FETCH_ALL_USER_LIST")
+                .Message("FETCH_ALL_BOOK_LIST")
                 .Data(paginatedItem.Data.ToList())
                 .Page(new PageResponse()
                 {
@@ -39,5 +41,72 @@ namespace Perpustakaan.Controllers
 
             return Ok(responseData);
         }
+
+        [HttpGet("{id:int}", Name = "GetBook")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize]
+        public ActionResult<BaseResponse<Book>> GetBook(int id)
+        {
+            var book = _service.FetchOne(id);
+            var responseData = BaseResponse<Book>.Builder()
+                .Code(StatusCodes.Status200OK)
+                .Message("FETCH_ONE_BOOK")
+                .Data(book)
+                .Build();
+
+            return Ok(responseData);
+        }
+
+        [HttpPost("create", Name = "CreateBook")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize]
+        public ActionResult<BaseResponse<Book>> CreateBook([FromBody] BookRequest request)
+        {
+            Book book = _service.Create(request);
+
+            var responseData = BaseResponse<Book>.Builder()
+                .Code(StatusCodes.Status200OK)
+                .Message("CREATE_BOOK_SUCCESS")
+                .Data(book)
+                .Build();
+
+            return Ok(responseData);
+        }
+
+        [HttpPut("{id:int}", Name = "UpdateBook")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize]
+        public ActionResult<BaseResponse<Book>> UpdateBook(int id, [FromBody] BookRequest bookRequest)
+        {
+            var book = _service.Update(id, bookRequest);
+            var responseData = BaseResponse<Book>.Builder()
+                .Code(StatusCodes.Status200OK)
+                .Message("UPDATE_BOOK_SUCCESS")
+                .Data(book)
+                .Build();
+
+            return Ok(responseData);
+        }
+
+
+        [HttpPost("delete", Name = "DeleteBook")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize]
+        public ActionResult<BaseResponse<List<string>>> DeleteBook([FromBody] DeleteRequest ids)
+        {
+            var deletedIds = _service.Delete(ids);
+            var responseData = BaseResponse<List<string>>.Builder()
+                .Code(StatusCodes.Status200OK)
+                .Message("VILLA_DELETED")
+                .Data(deletedIds)
+                .Build();
+
+            return Ok(responseData);
+        }
+
     }
 }

@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Perpustakaan.Data;
 using Perpustakaan.Data.Repositories.Implementation;
-using Perpustakaan.Exceptions;
 using Perpustakaan.Mappers;
+using Perpustakaan.Middleware;
+using Perpustakaan.Middleware.Exceptions;
 using Perpustakaan.Services;
+using Perpustakaan.Utils;
 using Perpustakaan.Utils.Filters;
 using System.Text;
 
@@ -54,8 +56,10 @@ IMapper mapper = MappingConfigs.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//Endpoint Authorization
+builder.Services.AddScoped<EndpointAuthorizationMiddleware>();
 //Global Exception Handler
-builder.Services.AddTransient<GlobalExceptionHandler>();
+builder.Services.AddScoped<GlobalExceptionHandler>();
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -63,15 +67,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddScoped<RequestValidator>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<RoleRepository>();
+builder.Services.AddScoped<EndpointRepository>();
 builder.Services.AddScoped<BookRepository>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<BookService>();
+builder.Services.AddTransient<UserService>();
+builder.Services.AddTransient<BookService>();
 
 //filter,searching,sorting util
-builder.Services.AddScoped(typeof(FilterUtil<>));
+builder.Services.AddTransient(typeof(FilterUtil<>));
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -91,6 +99,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddTransient<JwtUtil>();
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -107,6 +117,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseMiddleware<EndpointAuthorizationMiddleware>();
+app.UseMiddleware<GlobalExceptionHandler>();
 
 app.MapControllers();
 

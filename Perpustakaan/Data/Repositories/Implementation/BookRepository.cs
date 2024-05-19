@@ -4,8 +4,10 @@ using JustclickCoreModules.Requests;
 using Perpustakaan.Data.Entities;
 using Perpustakaan.Data.Repositories.Abstract;
 using Perpustakaan.Models.Requests;
+using Perpustakaan.Utils;
 using Perpustakaan.Utils.Filters;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Perpustakaan.Data.Repositories.Implementation
 {
@@ -15,12 +17,14 @@ namespace Perpustakaan.Data.Repositories.Implementation
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
         private readonly FilterUtil<Book> _filterUtil;
+        private readonly JwtUtil _jwtUtil;
 
-        public BookRepository(ApplicationDbContext db, IMapper mapper, FilterUtil<Book> filterUtil)
+        public BookRepository(ApplicationDbContext db, IMapper mapper, FilterUtil<Book> filterUtil, JwtUtil jwtUtil)
         {
             _filterUtil = filterUtil;
             _db = db;
             _mapper = mapper;
+            _jwtUtil = jwtUtil;
         }
 
         public List<Book> FetchAll()
@@ -48,9 +52,13 @@ namespace Perpustakaan.Data.Repositories.Implementation
 
         public Book Create(BookRequest request)
         {
+            string? userName = _jwtUtil.GetClaimValue(ClaimTypes.Name) ?? "";
+
             Book newBook = _mapper.Map<Book>(request);
             newBook.CreatedDate = DateTime.Now;
             newBook.UpdatedDate = DateTime.Now;
+            newBook.CreatedBy = userName;
+            newBook.UpdatedBy = userName;
 
             var createdBook = _db.Books.Add(newBook);
             _db.SaveChanges();
@@ -58,14 +66,16 @@ namespace Perpustakaan.Data.Repositories.Implementation
             return createdBook.Entity;
         }
 
-        public Book? Update(int id, BookRequest request, string updatedBy)
+        public Book? Update(int id, BookRequest request)
         {
+            string? userName = _jwtUtil.GetClaimValue(ClaimTypes.Name) ?? "";
+
             Book? book = _db.Books.AsNoTracking().FirstOrDefault(x => x.Id == id);
             if (book == null) return book;
 
             _mapper.Map<BookRequest, Book>(request, book);
             book.UpdatedDate = DateTime.Now;
-            book.UpdatedBy = updatedBy;
+            book.UpdatedBy = userName;
 
             _db.Books.Update(book);
             _db.SaveChanges();
