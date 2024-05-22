@@ -34,4 +34,9 @@
 	    </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="uploads\" />
+      <Folder Include="uploads\book\" />
+    </ItemGroup>
+
 </Project>

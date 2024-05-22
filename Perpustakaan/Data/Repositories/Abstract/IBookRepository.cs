@@ -10,7 +10,7 @@ namespace Perpustakaan.Data.Repositories.Abstract
         List<Book> FetchAll();
         Paginated<Book> FetchAll(SearchRequest request);
         Book? FetchOne(int id);
-        Book Create(BookRequest request);
+        Task<Book> CreateAsync(BookRequest request);
         Book? Update(int id, BookRequest request);
         List<string> Delete(DeleteRequest ids);
     }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Perpustakaan.Data.Entities;
 
-namespace Perpustakaan.Data
+namespace Perpustakaan.Configurations.Db
 {
     public class ApplicationDbContext : DbContext
     {
@@ -16,6 +16,7 @@ namespace Perpustakaan.Data
         public DbSet<EndpointPath> Endpoints { get; set; }
         public DbSet<EndpointRole> EndpointRoles { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<ImageCover> ImageCovers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,5 +1,6 @@
-﻿using Perpustakaan.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using JustclickCoreModules.Responses;
+using Perpustakaan.Configurations.Db;
 
 namespace Perpustakaan.Middleware
 {
@@ -17,22 +18,28 @@ namespace Perpustakaan.Middleware
         {
             var path = context.Request.Path.Value.ToLower();
             var method = context.Request.Method;
-
             List<string> publicEndpoints = [
+                "/uploads",
                 "/api/v1/user/register",
                 "/api/v1/user/login",
             ];
             bool isPublicAccess = false;
-
-            foreach (string publicPath in publicEndpoints)
+            
+            if(path == "/" || path == "") //index
             {
-                if (path.StartsWith(publicPath))
+                isPublicAccess = true;
+            }else
+            {
+                foreach (string publicPath in publicEndpoints)
                 {
-                    isPublicAccess = true;
-                    break;
+                    if (path.StartsWith(publicPath))
+                    {
+                        isPublicAccess = true;
+                        break;
+                    }
                 }
             }
-
+            
             if(isPublicAccess)
             {
                 await next(context);
@@ -64,11 +71,16 @@ namespace Perpustakaan.Middleware
             //                        roles.Name,
             //                    }).ToList();
 
-           
+            var problem = BaseResponse<string?>.Builder()
+                   .Code(StatusCodes.Status404NotFound)
+                   .Message("Endpoint Not Found")
+                   .Data(null);
+            context.Response.ContentType = "application/json";
+
             if (endpoint == null)
             {
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
-                await context.Response.WriteAsync("Endpoint not found");
+                await context.Response.WriteAsync(problem.ToJSONString());
                 return;
             }
 
@@ -76,10 +88,12 @@ namespace Perpustakaan.Middleware
             if (user == null || !user.Identity.IsAuthenticated)
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsync("Unauthorized");
+                problem.Message("You are not Authorized User");
+                problem.Code(StatusCodes.Status401Unauthorized);
+                await context.Response.WriteAsync(problem.ToJSONString());
                 return;
             }
-
+            
             var userId = int.Parse(user.Claims.First(c => c.Type == "UserId").Value);
             var userRoles =   await dbContext.UserRoles
                 .Where(ur => ur.UserId == userId)
@@ -91,7 +105,9 @@ namespace Perpustakaan.Middleware
             if (!hasAccess)
             {
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                await context.Response.WriteAsync("Forbidden");
+                problem.Message("Ooopss It's Forbidden");
+                problem.Code(StatusCodes.Status403Forbidden);
+                await context.Response.WriteAsync(problem.ToJSONString());
                 return;
             }
 

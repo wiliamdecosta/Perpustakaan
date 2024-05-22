@@ -18,7 +18,6 @@ namespace Perpustakaan.Services
             _repository = repository;   
         }
 
-
         public List<Book> FetchAll()
         {
             return _repository.FetchAll();
@@ -39,7 +38,7 @@ namespace Perpustakaan.Services
             return book;
         }
 
-        public Book Create(BookRequest request)
+        public async Task<Book> Create(BookRequest request)
         {
 
             if (!_validator.Validate(request))
@@ -48,7 +47,7 @@ namespace Perpustakaan.Services
             }
 
 
-            Book book = _repository.Create(request);
+            Book book = await _repository.CreateAsync(request);
             return book;
         }
 
@@ -60,7 +59,6 @@ namespace Perpustakaan.Services
                 throw new InvalidRequestValueException(_validator.Errors);
             }
             
-
             Book? book = _repository.Update(id, request);
             if (book == null)
             {

@@ -6,6 +6,7 @@ using Perpustakaan.Data.Repositories.Abstract;
 using Perpustakaan.Models.Requests;
 using Perpustakaan.Utils.Filters;
 using Microsoft.EntityFrameworkCore;
+using Perpustakaan.Configurations.Db;
 
 namespace Perpustakaan.Data.Repositories.Implementation
 {

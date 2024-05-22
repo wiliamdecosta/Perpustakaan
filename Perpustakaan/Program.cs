@@ -3,10 +3,11 @@ using DbUp;
 using JustclickCoreModules.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-using Perpustakaan.Data;
+using Perpustakaan.Configurations.Db;
+using Perpustakaan.Configurations.Mapper;
 using Perpustakaan.Data.Repositories.Implementation;
-using Perpustakaan.Mappers;
 using Perpustakaan.Middleware;
 using Perpustakaan.Middleware.Exceptions;
 using Perpustakaan.Services;
@@ -78,6 +79,7 @@ builder.Services.AddTransient<BookService>();
 
 //filter,searching,sorting util
 builder.Services.AddTransient(typeof(FilterUtil<>));
+builder.Services.AddTransient<UploadFileUtil>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(options =>
@@ -113,6 +115,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//untuk kepentingan upload files
+app.UseStaticFiles(); //ini untuk folder default wwwroot
+
+//ini untuk konfigurasi folder selain wwwroot
+var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
+
 
 app.UseAuthentication();
 

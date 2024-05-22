@@ -15,5 +15,7 @@ namespace Perpustakaan.Models.Requests
         public string Description { get; set; }
 
         public DateTime PublishDate {  get; set; }
+
+        public List<IFormFile> ImageCovers { get; set; }
     }
 }

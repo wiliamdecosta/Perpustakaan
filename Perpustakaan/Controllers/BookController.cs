@@ -62,9 +62,9 @@ namespace Perpustakaan.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize]
-        public ActionResult<BaseResponse<Book>> CreateBook([FromBody] BookRequest request)
+        public async Task<ActionResult<BaseResponse<Book>>> CreateBook([FromForm] BookRequest request)
         {
-            Book book = _service.Create(request);
+            Book book = await _service.Create(request);
 
             var responseData = BaseResponse<Book>.Builder()
                 .Code(StatusCodes.Status200OK)

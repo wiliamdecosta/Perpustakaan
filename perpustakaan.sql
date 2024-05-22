@@ -1,16 +1,22 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 8                                 */
-/* Created on:     19/05/2024 01:55:55                          */
+/* Created on:     22/05/2024 15:28:51                          */
 /*==============================================================*/
 
 
 drop index book_pk;
 
-drop table book;
+drop table books;
 
 drop index endpoint_pk;
 
-drop table endpoint;
+drop table endpoints;
+
+drop index r5_fk;
+
+drop index image_cover_pk;
+
+drop table image_cover;
 
 drop index role_pk;
 
@@ -37,46 +43,75 @@ drop index user_role_pk;
 drop table user_role;
 
 /*==============================================================*/
-/* Table: book                                                  */
+/* Table: books                                                 */
 /*==============================================================*/
-create table book (
+create table books (
    book_id              serial               not null,
    title                varchar(255)         not null,
    author               varchar(100)         not null,
    description          text                 null,
-   published_date       timestamp without time zone                 null,
-   created_date         timestamp without time zone                 null,
-   updated_date         timestamp without time zone                 null,
+   published_date       date                 null,
+   created_date         date                 null,
+   updated_date         date                 null,
    created_by           varchar(50)          null,
    updated_by           varchar(50)          null,
-   constraint pk_book primary key (book_id)
+   constraint pk_books primary key (book_id)
 );
 
 /*==============================================================*/
 /* Index: book_pk                                               */
 /*==============================================================*/
-create unique index book_pk on book (
+create unique index book_pk on books (
 book_id
 );
 
 /*==============================================================*/
-/* Table: endpoint                                              */
+/* Table: endpoints                                             */
 /*==============================================================*/
-create table endpoint (
+create table endpoints (
    endpoint_id          serial               not null,
-   path_route           varchar(500)         not null,
+   path                 varchar(500)         not null,
    method               varchar(15)          not null,
    description          text                 null,
-   created_date         timestamp without time zone                 null,
-   updated_date         timestamp without time zone                 null,
-   constraint pk_endpoint primary key (endpoint_id)
+   created_date         date                 null,
+   updated_date         date                 null,
+   constraint pk_endpoints primary key (endpoint_id)
 );
 
 /*==============================================================*/
 /* Index: endpoint_pk                                           */
 /*==============================================================*/
-create unique index endpoint_pk on endpoint (
+create unique index endpoint_pk on endpoints (
 endpoint_id
+);
+
+/*==============================================================*/
+/* Table: image_cover                                           */
+/*==============================================================*/
+create table image_cover (
+   image_cover_id       serial               not null,
+   book_id              int4                 null,
+   file_name            varchar(100)         not null,
+   file_path            varchar(100)         null,
+   created_date         date                 not null,
+   updated_date         date                 null,
+   created_by           varchar(50)          null,
+   updated_by           varchar(50)          null,
+   constraint pk_image_cover primary key (image_cover_id)
+);
+
+/*==============================================================*/
+/* Index: image_cover_pk                                        */
+/*==============================================================*/
+create unique index image_cover_pk on image_cover (
+image_cover_id
+);
+
+/*==============================================================*/
+/* Index: r5_fk                                                 */
+/*==============================================================*/
+create  index r5_fk on image_cover (
+book_id
 );
 
 /*==============================================================*/
@@ -85,8 +120,8 @@ endpoint_id
 create table roles (
    role_id              serial               not null,
    name                 varchar(50)          not null,
-   created_date         timestamp without time zone                 null,
-   updated_date         timestamp without time zone                 null,
+   created_date         date                 null,
+   updated_date         date                 null,
    constraint pk_roles primary key (role_id)
 );
 
@@ -104,8 +139,8 @@ create table role_endpoint (
    role_endpoint_id     serial               not null,
    role_id              int4                 null,
    endpoint_id          int4                 null,
-   created_date         timestamp without time zone                 null,
-   updated_date         timestamp without time zone                 null,
+   created_date         date                 null,
+   updated_date         date                 null,
    constraint pk_role_endpoint primary key (role_endpoint_id)
 );
 
@@ -138,10 +173,10 @@ create table users (
    name                 varchar(50)          not null,
    email                varchar(50)          not null,
    password             varchar(255)         not null,
-   created_date         timestamp without time zone                 null,
-   updated_date         timestamp without time zone                 null,
+   created_date         date                 null,
+   updated_date         date                 null,
    refresh_token        text                 null,
-   refresh_token_expiry_time timestamp without time zone                 null,
+   refresh_token_expiry_time date                 null,
    constraint pk_users primary key (user_id)
 );
 
@@ -159,8 +194,8 @@ create table user_role (
    user_role_id         serial               not null,
    user_id              int4                 null,
    role_id              int4                 null,
-   created_date         timestamp without time zone                 null,
-   updated_date         timestamp without time zone                 null,
+   created_date         date                 null,
+   updated_date         date                 null,
    constraint pk_user_role primary key (user_role_id)
 );
 
@@ -185,6 +220,11 @@ create  index r2_fk on user_role (
 role_id
 );
 
+alter table image_cover
+   add constraint fk_image_co_r5_books foreign key (book_id)
+      references books (book_id)
+      on delete restrict on update restrict;
+
 alter table role_endpoint
    add constraint fk_role_end_r3_roles foreign key (role_id)
       references roles (role_id)
@@ -192,7 +232,7 @@ alter table role_endpoint
 
 alter table role_endpoint
    add constraint fk_role_end_r4_endpoint foreign key (endpoint_id)
-      references endpoint (endpoint_id)
+      references endpoints (endpoint_id)
       on delete restrict on update restrict;
 
 alter table user_role

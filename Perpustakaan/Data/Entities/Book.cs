@@ -37,5 +37,6 @@ namespace Perpustakaan.Data.Entities
         [Column(name: "updated_by")]
         public string UpdatedBy { get; set; }
 
+        public virtual ICollection<ImageCover> ImageCovers { get; set; } = [];
     }
 }
