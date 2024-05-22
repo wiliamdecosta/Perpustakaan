@@ -3,6 +3,7 @@
 namespace Perpustakaan.Controllers
 {
     [Route("/")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AppController : ControllerBase
     {
         [HttpGet]
