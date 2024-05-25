@@ -1,0 +1,5 @@
+sudo apt-get install ufw
+sudo ufw allow ssh
+sudo ufw allow 8100/tcp
+sudo ufw enable
+sudo ufw status

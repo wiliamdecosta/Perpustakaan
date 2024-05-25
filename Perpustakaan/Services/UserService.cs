@@ -5,6 +5,8 @@ using JustclickCoreModules.Validators;
 using Perpustakaan.Data.Entities;
 using Perpustakaan.Data.Repositories.Implementation;
 using Perpustakaan.Models.Requests;
+using Perpustakaan.Models.Responses;
+using Perpustakaan.Utils;
 
 namespace Perpustakaan.Services
 {
@@ -89,6 +91,42 @@ namespace Perpustakaan.Services
             User updatedUser = _repository.Update(user);
 
             return updatedUser;
+        }
+
+        public RefreshTokenResponse? GetNewToken(RefreshTokenRequest request, IConfiguration configuration)
+        {
+            if (!_validator.Validate(request))
+            {
+                throw new InvalidRequestValueException(_validator.Errors);
+            }
+
+            var principal = JwtUtil.GetPrincipalFromExpiredToken(request.Token, configuration);
+            if (principal == null) return null;
+
+            var userIdClaim = principal.FindFirst("UserId");
+            if (userIdClaim == null) return null;
+
+            var userId = userIdClaim.Value;
+            User user = this.FetchOne(int.Parse(userId));
+
+            if(user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow) 
+            {
+                return null;
+            }
+
+            var newToken = JwtUtil.GenerateJwtToken(user, configuration);
+            var newRefreshToken = JwtUtil.GenerateRefreshToken();
+
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow;
+            User updateRefreshToken = this.UpdateRefreshToken(user);
+
+            return new RefreshTokenResponse()
+            {
+                Token = newToken,
+                RefreshToken = updateRefreshToken.RefreshToken!,
+            };
+
         }
     }
 }

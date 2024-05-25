@@ -22,11 +22,11 @@ configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: t
 configuration.AddEnvironmentVariables();
 
 string connectionString = configuration["ConnectionStrings:DefaultPostgreConnection"]
-    .Replace("__DB_SERVER__", configuration["DB_SERVER_PERPUS"])
-    .Replace("__DB_PORT__", configuration["DB_PORT_PERPUS"])
-    .Replace("__DB_NAME__", configuration["DB_NAME_PERPUS"])
-    .Replace("__DB_USERNAME__", configuration["DB_USERNAME_PERPUS"])
-    .Replace("__DB_PASSWORD__", configuration["DB_PASSWORD_PERPUS"]);
+    .Replace("__DB_SERVER__", Environment.GetEnvironmentVariable("DB_SERVER_PERPUS"))
+    .Replace("__DB_PORT__", Environment.GetEnvironmentVariable("DB_PORT_PERPUS"))
+    .Replace("__DB_NAME__", Environment.GetEnvironmentVariable("DB_NAME_PERPUS"))
+    .Replace("__DB_USERNAME__", Environment.GetEnvironmentVariable("DB_USERNAME_PERPUS"))
+    .Replace("__DB_PASSWORD__", Environment.GetEnvironmentVariable("DB_PASSWORD_PERPUS"));
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -119,7 +119,7 @@ app.UseHttpsRedirection();
 //untuk kepentingan upload files
 app.UseStaticFiles(); //ini untuk folder default wwwroot
 
-//ini untuk konfigurasi folder selain wwwroot
+//konfigurasi folder selain wwwroot
 var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
 app.UseStaticFiles(new StaticFileOptions
 {

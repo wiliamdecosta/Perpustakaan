@@ -1,0 +1,31 @@
+version: '1.0'
+
+services:
+  app:
+    image: wiliamdecosta/perpusnet:latest #pull image dari repo docker hub wiliamdecosta/perpusnet
+    build: .
+    ports:
+      - "8200:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_SERVER_PERPUS=database
+      - DB_PORT_PERPUS=5432
+      - DB_NAME_PERPUS=db_perpus
+      - DB_USERNAME_PERPUS=postgres
+      - DB_PASSWORD_PERPUS=postgres
+    depends_on:
+      - database
+
+  database:
+    image: postgres:14.2
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: db_perpus
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

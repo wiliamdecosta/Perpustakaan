@@ -1,5 +1,6 @@
 ﻿using JustclickCoreModules.Filters;
 using JustclickCoreModules.Responses;
+using JustclickCoreModules.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Perpustakaan.Data.Entities;
@@ -15,6 +16,7 @@ namespace Perpustakaan.Controllers
     {
         private readonly UserService _service;
         private readonly IConfiguration _configuration;
+        
         public UserController(UserService service, IConfiguration configuration)
         {
             _service = service;
@@ -124,6 +126,26 @@ namespace Perpustakaan.Controllers
                 return BadRequest(responseData);
             }
 
+        }
+
+        [HttpPost("refresh_token")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<BaseResponse<RefreshTokenResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+
+            RefreshTokenResponse? result = _service.GetNewToken(request, _configuration);
+            var responseData = BaseResponse<RefreshTokenResponse>.Builder()
+                        .Code(StatusCodes.Status200OK);
+
+            if (result == null)
+            {
+                return BadRequest(responseData.Data(result)
+                    .Code(StatusCodes.Status400BadRequest)
+                    .Message("Token Invalid or Expired Refresh Token").Build());
+            }
+
+            return Ok(responseData.Data(result).Message("Refresh token berhasil").Build());
         }
     }
 }

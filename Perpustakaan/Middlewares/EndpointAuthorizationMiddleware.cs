@@ -22,6 +22,7 @@ namespace Perpustakaan.Middleware
                 "/uploads",
                 "/api/v1/user/register",
                 "/api/v1/user/login",
+                "/api/v1/user/refresh_token",
             ];
             bool isPublicAccess = false;
             

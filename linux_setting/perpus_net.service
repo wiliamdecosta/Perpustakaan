@@ -1,0 +1,25 @@
+#sudo nano /etc/systemd/system/perpus_net.service
+
+[Unit]
+Description=ASP.NET Core Application - Perpustakaan
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/perpus_net
+ExecStart=/usr/bin/dotnet /var/www/perpus_net/Perpustakaan.dll
+Restart=always
+RestartSec=10
+SyslogIdentifier=dotnet-perpus_net
+User=root
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Environment=ASPNETCORE_URLS=http://localhost:5000
+# Environment variables for database connection
+Environment=DB_SERVER_PERPUS=localhost
+Environment=DB_PORT_PERPUS=5432
+Environment=DB_NAME_PERPUS=db_perpus
+Environment=DB_USERNAME_PERPUS=postgres
+Environment=DB_PASSWORD_PERPUS=laruen@1234
+
+[Install]
+WantedBy=multi-user.target

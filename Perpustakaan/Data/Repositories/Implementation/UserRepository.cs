@@ -44,12 +44,12 @@ namespace Perpustakaan.Data.Repositories.Implementation
 
         public User? FetchOne(int id)
         {
-            return _db.Users.FirstOrDefault(x => x.Id == id);
+            return _db.Users.AsNoTracking().FirstOrDefault(x => x.Id == id);
         }
 
         public User? FetchByEmail(string email)
         {
-            return _db.Users.FirstOrDefault(x => x.Email == email);
+            return _db.Users.AsNoTracking().FirstOrDefault(x => x.Email == email);
         }
 
         public User Register(UserRequest request)
